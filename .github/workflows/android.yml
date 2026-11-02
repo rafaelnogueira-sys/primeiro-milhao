@@ -1,10 +1,15 @@
 name: Gerar APK do Android
 
-# Roda ao enviar uma tag (git tag v1.0.0 && git push --tags) ou manualmente em Actions → Run workflow.
+# Roda sozinho a cada alteração do app enviada para a main, ao enviar uma tag (v1.0.0)
+# ou manualmente em Actions → Run workflow. O APK novo vai para Releases e o botão do site já aponta para ele.
 on:
   push:
+    branches: [main]
+    paths: ['app/**', 'capacitor.config.json', 'package.json', 'assets/**', 'scripts/**', '.github/workflows/android.yml']
     tags: ['v*']
   workflow_dispatch:
+
+concurrency: { group: apk, cancel-in-progress: true }
 
 permissions:
   contents: write

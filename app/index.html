@@ -13,13 +13,13 @@
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
+<link rel="preload" href="fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* Visual: fundo claro, cartões brancos e cartões pretos de destaque, fonte Montserrat.
-   Preto e branco para a interface; verde = meta atingida; vermelho = meta não atingida; cada categoria de gasto tem cor própria.
-   Para trocar a fonte, mude o link do Google Fonts acima e a variável --f abaixo. */
+   Preto e branco para a interface; verde = meta atingida / alta; vermelho = meta não atingida / queda; cada categoria de gasto tem cor própria.
+   A fonte vem junto com o app (fonts/), então aparece igual no site e no APK, mesmo sem internet.
+   Para trocar a fonte, troque o arquivo em fonts/ e a variável --f abaixo. */
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:100 900;font-display:swap;src:url(fonts/montserrat-latin.woff2) format('woff2')}
 :root{
   --paper:#f6f6f7; --panel:#ffffff; --ink:#0a0a0a; --sub:#6b6b70; --faint:#a3a3a8; --line:#ececee; --soft:#f3f3f5;
   --ok:#12884f; --ok-bg:#e3f4ea; --bad:#d0342c; --bad-bg:#fdeceb;
@@ -55,10 +55,15 @@ svg.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wi
 .marca::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink)}
 .avatar{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--soft);display:grid;place-items:center;font:700 13px var(--f);letter-spacing:.02em;cursor:pointer;flex:none;padding:0}
 .avatar svg.ico{width:18px;height:18px;color:var(--sub)}
+.avatar{position:relative}
+.avatar::after{content:"";position:absolute;right:0;bottom:0;width:11px;height:11px;border-radius:50%;border:2px solid var(--panel);background:var(--faint);display:none}
+.avatar[data-sync="ok"]::after{display:block;background:var(--ok)}
+.avatar[data-sync="indo"]::after{display:block;background:#e3a008}
+.avatar[data-sync="erro"]::after{display:block;background:var(--bad)}
 
 /* Navegação: barra inferior no celular, abas no cabeçalho na tela grande */
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:8px max(8px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px))}
-.aba{background:none;border:0;display:grid;justify-items:center;gap:5px;padding:6px 4px;cursor:pointer;color:var(--faint);font:700 10.5px var(--f);text-transform:uppercase;letter-spacing:.05em;border-radius:12px}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:8px max(8px,env(safe-area-inset-left,0px)) calc(8px + env(safe-area-inset-bottom,0px))}
+.aba{background:none;border:0;display:grid;justify-items:center;gap:5px;padding:6px 2px;cursor:pointer;color:var(--faint);font:700 9.5px var(--f);text-transform:uppercase;letter-spacing:.03em;border-radius:12px;min-width:0}
 .aba svg.ico{width:22px;height:22px}
 .aba[aria-selected="true"]{color:var(--ink)}
 .aba[aria-selected="true"] svg.ico{stroke-width:2.2}
@@ -121,6 +126,7 @@ main .wrap{padding-top:22px;padding-bottom:calc(var(--nav-h) + 40px + env(safe-a
 .linhas .ln span{min-width:0;display:flex;align-items:center;gap:10px;color:#2b2b2f}
 .linhas .ln span em{font-style:normal;color:var(--faint);font-size:12px;white-space:nowrap}
 .linhas .ln b{font-weight:700;white-space:nowrap}
+.linhas .ln b.ok-t,.linhas .ln span em.ok-t{color:var(--ok)} .linhas .ln b.bad-t,.linhas .ln span em.bad-t{color:var(--bad)}
 .linhas .vazio{color:var(--sub);font-size:14px;padding:6px 0}
 .mini-meta{display:grid;gap:8px;padding:12px 0}
 .mini-meta + .mini-meta{border-top:1px solid #f4f4f6}
@@ -255,6 +261,52 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
 .lnk{color:var(--ink);font-weight:700}
 .copias{display:grid;gap:6px}.copia{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
 @media (prefers-reduced-motion:no-preference){.barra i{transition:width .35s ease}}
+
+/* Investimentos */
+.pag-tit-linha{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px}
+.pos{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;background:none;border:0;border-top:1px solid #f4f4f6;padding:12px 4px;margin:0 -4px;width:calc(100% + 8px);text-align:left;cursor:pointer;border-radius:10px;color:var(--ink)}
+.pos:first-child{border-top:0}
+.pos:hover{background:var(--soft)}
+.pos-esq,.pos-dir{display:grid;gap:2px;min-width:0;align-content:start}
+.pos-esq{flex:1}
+.pos-dir{text-align:right;flex:none}
+.pos b{font-weight:700;font-size:15px}
+.pos small{font-size:12.5px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pos small.ok-t{color:var(--ok)} .pos small.bad-t{color:var(--bad)}
+.tag{font:700 10px var(--f);text-transform:uppercase;letter-spacing:.04em;color:var(--sub);background:var(--soft);border-radius:6px;padding:2px 6px;margin-left:6px;vertical-align:2px}
+.preto .par small{display:block}
+.preto .par b.ok-t,.preto .grande .ok-t{color:var(--ok)}
+.preto .rodape button{background:none;border:0;color:#fff;font:700 12.5px var(--f);text-decoration:underline;cursor:pointer;padding:0}
+.preto .rodape button:disabled{opacity:.5;cursor:default}
+.aviso-cot{font-size:12.5px;color:var(--bad);background:var(--bad-bg);border-radius:10px;padding:9px 12px}
+.vazio-inv{display:grid;gap:12px;justify-items:start}
+.vazio-inv p{color:var(--sub);font-size:14px;max-width:52ch}
+
+dialog#dlgInv{border:0;padding:0;border-radius:24px;width:min(480px,calc(100vw - 32px));max-width:none;max-height:calc(100dvh - 32px);overflow:auto;background:#fff;color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.25)}
+dialog#dlgInv::backdrop{background:rgba(10,10,10,.45)}
+#formInv{padding:20px;display:grid;gap:16px}
+.dlg-cab{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dlg-cab h3{font-size:18px;font-weight:800}
+.tipos{display:flex;flex-wrap:wrap;gap:6px}
+.tipos button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 13px;font:600 12.5px var(--f);cursor:pointer;color:var(--ink)}
+.tipos button[aria-checked="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.dlg-acoes{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dlg-acoes .esp{flex:1}
+.previa{font-size:13px;color:var(--sub);background:var(--soft);border-radius:10px;padding:10px 12px}
+.previa b{color:var(--ink)}
+@media (max-width:600px){
+  dialog#dlgInv{margin:auto 0 0;width:100%;max-height:92dvh;border-radius:24px 24px 0 0}
+  #formInv{padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+}
+
+/* Sincronização */
+.sync-pill{font:700 10.5px var(--f);text-transform:uppercase;letter-spacing:.05em;padding:5px 10px;border-radius:99px;background:var(--soft);color:var(--sub);white-space:nowrap}
+.sync-pill.ok{background:var(--ok-bg);color:var(--ok)} .sync-pill.erro{background:var(--bad-bg);color:var(--bad)} .sync-pill.indo{background:#fdf3d7;color:#8a6100}
+.codigo-linha{display:flex;gap:8px}
+.codigo-linha input{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+details.primeira{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px}
+details.primeira summary{cursor:pointer;font-weight:700;font-size:14px}
+details.primeira[open] summary{margin-bottom:12px}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
@@ -266,6 +318,8 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
     <nav class="nav" aria-label="Seções" role="tablist">
       <button class="aba" role="tab" data-tab="resumo" aria-selected="true">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Resumo</button>
+      <button class="aba" role="tab" data-tab="carteira" aria-selected="false">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a1 1 0 0 1 1 1v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-4a2 2 0 0 1 0-4z"/></svg>Carteira</button>
       <button class="aba" role="tab" data-tab="metas" aria-selected="false">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Simulação</button>
       <button class="aba" role="tab" data-tab="orcamento" aria-selected="false">
@@ -311,10 +365,33 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
           <div class="linhas" id="listaSaidas"></div>
         </div>
         <div class="painel">
+          <div class="cab"><h3 class="tit-ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h14a1 1 0 0 1 1 1v3"/><path d="M3 5v14a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-4a2 2 0 0 1 0-4z"/></svg>Sua Carteira</h3><button class="btn sec peq" data-tab="carteira">Ver tudo</button></div>
+          <div class="linhas" id="resCarteira"></div>
+        </div>
+        <div class="painel">
           <div class="cab"><h3 class="tit-ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>Suas Metas</h3><button class="btn sec peq" data-tab="metas">Simular</button></div>
           <div id="miniMetas"></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ===================== CARTEIRA (INVESTIMENTOS) ===================== -->
+  <section id="v-carteira" class="coluna" hidden>
+    <div class="pag-tit-linha">
+      <div class="pag-tit"><h1>Investimentos</h1><p>Ações, ETFs, FIIs, criptomoedas e renda fixa, com cotações atualizadas.</p></div>
+      <button class="btn" data-acao="novo-inv">+ Investimento</button>
+    </div>
+    <div class="resumo-grade">
+      <div class="coluna">
+        <div class="preto" id="cardCarteira"></div>
+        <div class="painel" id="painelDist">
+          <div class="cab"><h3>Distribuição</h3></div>
+          <div class="faixa" id="faixaInv"></div>
+          <div class="linhas" id="distInv"></div>
+        </div>
+      </div>
+      <div class="coluna" id="listasInv"></div>
     </div>
   </section>
 
@@ -348,6 +425,7 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
             <div class="campo">
               <label for="f-saldo">Quanto já tem investido</label>
               <div class="entrada"><span>R$</span><input id="f-saldo" inputmode="decimal" data-bind="saldoInicial" data-tipo="moeda"></div>
+              <label class="check"><input type="checkbox" id="f-usarCarteira" data-bind="usarCarteira" data-tipo="check"> <span id="usarCarteiraTxt">Usar o total da minha carteira de investimentos</span></label>
             </div>
             <div class="dupla">
               <div class="campo">
@@ -507,6 +585,72 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
       </div>
     </div>
 
+    <div class="painel" id="painelSync">
+      <div class="cab"><h3 class="tit-ico"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 21v-5h5"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5"/></svg>Sincronizar celular e site</h3><span class="sync-pill" id="syncPill">Desligada</span></div>
+      <div class="campos">
+        <div class="status" id="statusPlanilha">Sem planilha conectada. Os dados ficam só neste aparelho.</div>
+
+        <div id="syncConectado" class="campos" hidden>
+          <p class="nota">Tudo o que você muda aqui vai para a sua planilha do Google e aparece nos outros aparelhos conectados: na hora em que o app é aberto, quando você volta para ele e a cada 45 segundos com ele aberto.</p>
+          <div class="campo">
+            <label for="c-codigo">Código para conectar outro aparelho</label>
+            <div class="codigo-linha"><input type="text" id="c-codigo" readonly aria-describedby="c-codigo-dica"><button class="btn sec" data-acao="copiar-codigo">Copiar</button></div>
+            <small id="c-codigo-dica">Mande para você mesmo (WhatsApp, e-mail) e cole no outro aparelho, em Ajustes. Quem tiver este código consegue ver e alterar os seus dados.</small>
+          </div>
+          <div class="linha-acoes" style="margin-top:0">
+            <button class="btn" data-acao="sync-agora">Sincronizar agora</button>
+            <button class="btn sec" data-acao="planilha-carregar">Trazer tudo da planilha</button>
+            <button class="btn sec" data-acao="planilha-salvar">Enviar este aparelho para a planilha</button>
+            <button class="btn perigo" data-acao="desconectar">Desconectar</button>
+          </div>
+        </div>
+
+        <div id="syncDesconectado" class="campos">
+          <div class="campo">
+            <label for="c-colar">Já conectou em outro aparelho? Cole o código aqui</label>
+            <div class="codigo-linha"><input type="text" id="c-colar" placeholder="código de conexão" autocomplete="off" spellcheck="false"><button class="btn" data-acao="conectar-codigo">Conectar</button></div>
+            <small>Ao conectar, este aparelho passa a usar os dados da planilha. O que havia aqui fica guardado nas cópias de segurança abaixo.</small>
+          </div>
+          <details class="primeira" id="primeiraVez">
+            <summary>Primeira vez: criar a planilha (5 minutos)</summary>
+            <div class="campos">
+              <ol class="passos">
+                <li>Crie uma planilha nova no Google Sheets.</li>
+                <li>Abra <b>Extensões → Apps Script</b>, apague o conteúdo e cole o arquivo <b>apps-script/Codigo.gs</b> do projeto.</li>
+                <li>Troque o valor de <b>TOKEN</b> por uma senha só sua e salve.</li>
+                <li>Clique em <b>Implantar → Nova implantação → App da Web</b>. Executar como: <b>Eu</b>. Quem pode acessar: <b>Qualquer pessoa</b>.</li>
+                <li>Autorize o acesso, copie a URL que termina em <b>/exec</b> e cole abaixo junto com o token.</li>
+              </ol>
+              <div class="campo">
+                <label for="c-url">URL do App da Web (Apps Script)</label>
+                <input type="text" id="c-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false">
+              </div>
+              <div class="campo">
+                <label for="c-token">Token de acesso</label>
+                <input type="text" id="c-token" placeholder="o mesmo TOKEN definido no Apps Script" autocomplete="off" spellcheck="false">
+                <small>Fica salvo só neste aparelho. Não coloque o token no código que vai para o GitHub.</small>
+              </div>
+              <div class="linha-acoes" style="margin-top:0"><button class="btn" data-acao="conectar">Conectar à planilha</button></div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <div class="painel">
+      <div class="cab"><h3>Cotações</h3><p class="sub">de onde vêm os preços da carteira</p></div>
+      <ol class="passos" style="list-style:disc">
+        <li><b>Criptomoedas:</b> CoinGecko, sem cadastro (variação de 24 h).</li>
+        <li><b>Ações, ETFs e FIIs da B3:</b> Google Finance, pela sua planilha conectada. Sem planilha, use um token gratuito da brapi.dev.</li>
+        <li><b>Renda fixa e outros:</b> você informa o valor atual.</li>
+      </ol>
+      <div class="campo" style="max-width:460px;margin-top:14px">
+        <label for="c-brapi">Token da brapi.dev (opcional)</label>
+        <input type="text" id="c-brapi" placeholder="só se não usar a planilha" autocomplete="off" spellcheck="false">
+        <small>Crie grátis em brapi.dev → Dashboard. Fica salvo só neste aparelho. Os preços da B3 têm atraso de alguns minutos.</small>
+      </div>
+    </div>
+
     <div class="painel">
       <div class="cab"><h3>Banco de dados do aparelho</h3><p class="estado-salvo" id="estadoSalvo">Carregando…</p></div>
       <div class="status" id="bancoStatus">Verificando…</div>
@@ -519,40 +663,6 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
       <div class="cab"><h3>Instalar no celular</h3></div>
       <p class="nota" style="margin-bottom:12px">Instale como app para abrir pela tela inicial, em tela cheia e sem internet.</p>
       <div class="linha-acoes" style="margin-top:0"><button class="btn" data-acao="instalar">Instalar app</button><a class="btn sec" href="../" style="text-decoration:none">Outras formas de baixar</a></div>
-    </div>
-
-    <div class="painel">
-      <div class="cab"><h3>Google Sheets</h3><p class="sub">sua planilha como banco de dados</p></div>
-      <div class="campos" style="max-width:640px">
-        <div class="campo">
-          <label for="c-url">URL do App da Web (Apps Script)</label>
-          <input type="text" id="c-url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" spellcheck="false">
-        </div>
-        <div class="campo">
-          <label for="c-token">Token de acesso</label>
-          <input type="text" id="c-token" placeholder="o mesmo TOKEN definido no Apps Script" autocomplete="off" spellcheck="false">
-          <small>Fica salvo só neste navegador. Não coloque o token no código que vai para o GitHub.</small>
-        </div>
-        <label class="check"><input type="checkbox" id="c-auto"> Salvar na planilha automaticamente a cada alteração</label>
-        <div class="linha-acoes" style="margin-top:0">
-          <button class="btn" data-acao="planilha-salvar">Salvar na planilha</button>
-          <button class="btn sec" data-acao="planilha-carregar">Carregar da planilha</button>
-        </div>
-        <div class="status" id="statusPlanilha">Sem planilha conectada. Os dados ficam salvos neste navegador.</div>
-      </div>
-    </div>
-
-    <div class="painel">
-      <div class="cab"><h3>Como conectar</h3></div>
-      <ol class="passos">
-        <li>Crie uma planilha nova no Google Sheets.</li>
-        <li>Abra <b>Extensões → Apps Script</b>, apague o conteúdo e cole o arquivo <b>apps-script/Codigo.gs</b> do projeto.</li>
-        <li>Troque o valor de <b>TOKEN</b> por uma senha só sua e salve.</li>
-        <li>Clique em <b>Implantar → Nova implantação → App da Web</b>. Executar como: <b>Eu</b>. Quem pode acessar: <b>Qualquer pessoa</b>.</li>
-        <li>Autorize o acesso, copie a URL que termina em <b>/exec</b> e cole acima junto com o token.</li>
-        <li>Clique em <b>Salvar na planilha</b>. As abas Perfil, Metas, Categorias, Recorrentes e Pontuais são criadas sozinhas.</li>
-      </ol>
-      <p class="nota" style="margin-top:12px">Dentro do Claude a página não consegue acessar sites externos, então a conexão com a planilha funciona na versão publicada no GitHub Pages ou aberta direto do seu computador.</p>
     </div>
 
     <div class="painel">
@@ -580,6 +690,35 @@ ol.passos{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;max-wid
 </div>
 </main>
 
+<dialog id="dlgInv" aria-labelledby="dlgTit">
+  <form id="formInv" novalidate>
+    <div class="dlg-cab"><h3 id="dlgTit">Novo investimento</h3><button type="button" class="x" data-acao="fechar-inv" aria-label="Fechar">×</button></div>
+    <div class="tipos" role="radiogroup" aria-label="Tipo de investimento" id="tiposInv"></div>
+    <div class="campos">
+      <div class="campo">
+        <label for="i-ativo" id="i-ativo-rot">Código</label>
+        <input type="text" id="i-ativo" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40">
+        <small id="i-ativo-dica"></small>
+      </div>
+      <div class="dupla" id="i-mercado">
+        <div class="campo"><label for="i-qtd" id="i-qtd-rot">Quantidade</label><div class="entrada"><input id="i-qtd" inputmode="decimal" autocomplete="off"></div></div>
+        <div class="campo"><label for="i-pm">Preço médio</label><div class="entrada"><span>R$</span><input id="i-pm" inputmode="decimal" autocomplete="off"></div></div>
+      </div>
+      <div class="dupla" id="i-manual" hidden>
+        <div class="campo"><label for="i-aplicado">Valor aplicado</label><div class="entrada"><span>R$</span><input id="i-aplicado" inputmode="decimal" autocomplete="off"></div></div>
+        <div class="campo"><label for="i-atual">Valor atual</label><div class="entrada"><span>R$</span><input id="i-atual" inputmode="decimal" autocomplete="off"></div></div>
+      </div>
+      <div class="previa" id="i-previa"></div>
+    </div>
+    <div class="dlg-acoes">
+      <button type="button" class="btn perigo" data-acao="excluir-inv" id="i-excluir">Excluir</button>
+      <span class="esp"></span>
+      <button type="button" class="btn sec" data-acao="fechar-inv">Cancelar</button>
+      <button type="submit" class="btn">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 (function () {
 'use strict';
@@ -591,7 +730,9 @@ const CONFIG = {
   SHEETS_URL: '',                         // opcional: URL /exec do Apps Script (o token vai pela tela, não pelo código)
   STORAGE_KEY: 'primeiro-milhao',     // chave do salvamento local
   TAXAS_CENARIO: [0.7, 0.85, 1.0, 1.15],  // % ao mês comparadas na tabela "E se o rendimento mudar?"
-  MAX_MESES: 720                           // horizonte máximo da busca "em quanto tempo" (60 anos)
+  MAX_MESES: 720,                          // horizonte máximo da busca "em quanto tempo" (60 anos)
+  SYNC_INTERVALO_MS: 45 * 1000,            // com o app aberto, confere a planilha a cada 45 s
+  COTACAO_VALIDADE_MS: 15 * 60 * 1000      // cotações com mais de 15 min são buscadas de novo
 };
 
 const CATEGORIAS_PADRAO = [
@@ -605,6 +746,16 @@ const CATEGORIAS_PADRAO = [
   { id: 'assinaturas', nome: 'Assinaturas', cor: '#A77BE0' },
   { id: 'outros',      nome: 'Outros',      cor: '#9A9A95' }
 ];
+
+const TIPOS_INV = {
+  acao:   { nome: 'Ações e ETFs',        curto: 'Ação / ETF', cor: '#5B5BD6', ex: 'PETR4' },
+  fii:    { nome: 'Fundos imobiliários', curto: 'FII',        cor: '#F2994A', ex: 'MXRF11' },
+  cripto: { nome: 'Criptomoedas',        curto: 'Cripto',     cor: '#C9A227', ex: 'BTC' },
+  rf:     { nome: 'Renda fixa',          curto: 'Renda fixa', cor: '#13A8B8', ex: 'Tesouro Selic 2029' },
+  outro:  { nome: 'Outros',              curto: 'Outro',      cor: '#9A9A95', ex: 'Previdência' }
+};
+const manualInv = t => t === 'rf' || t === 'outro'; // sem cotação: você informa o valor atual
+const chaveCot = inv => (inv.tipo === 'cripto' ? 'CRIPTO:' : 'B3:') + inv.ativo;
 
 /* =========================================================================
    Utilidades
@@ -660,7 +811,7 @@ function dadosExemplo() {
   const r = (catId, descricao, valor) => ({ id: uid(), catId, descricao, valor, inicio: '', fim: '' });
   return {
     versao: 1, exemplo: true,
-    perfil: { nome: '', inicio: hojeYm, aporte: 2000, saldoInicial: 5000, taxaMensal: 1, crescimentoAporte: 0, inflacao: 4.5 },
+    perfil: { nome: '', usarCarteira: false, inicio: hojeYm, aporte: 2000, saldoInicial: 5000, taxaMensal: 1, crescimentoAporte: 0, inflacao: 4.5 },
     rendas: [{ id: 'rd1', descricao: 'Salário líquido', valor: 8000, inicio: '', fim: '' }],
     rendasPontuais: [{ id: 'rp1', mes: ano + '-12', descricao: '13º salário', valor: 4000 }],
     metas: [
@@ -685,6 +836,12 @@ function dadosExemplo() {
       { id: uid(), mes: ano + '-03', catId: 'saude', descricao: 'Dentista', valor: 400 },
       { id: uid(), mes: ano + '-07', catId: 'lazer', descricao: 'Viagem de férias', valor: 2800 },
       { id: uid(), mes: ano + '-12', catId: 'lazer', descricao: 'Presentes de fim de ano', valor: 900 }
+    ],
+    investimentos: [
+      { id: 'iv1', tipo: 'acao', ativo: 'PETR4', quantidade: 50, precoMedio: 34.5, valorManual: 0 },
+      { id: 'iv2', tipo: 'fii', ativo: 'MXRF11', quantidade: 150, precoMedio: 9.9, valorManual: 0 },
+      { id: 'iv3', tipo: 'cripto', ativo: 'BTC', quantidade: 0.002, precoMedio: 380000, valorManual: 0 },
+      { id: 'iv4', tipo: 'rf', ativo: 'Tesouro Selic 2029', quantidade: 1, precoMedio: 1500, valorManual: 1580 }
     ]
   };
 }
@@ -692,7 +849,7 @@ function dadosVazios() {
   const d = dadosExemplo();
   d.exemplo = false;
   d.perfil = { ...d.perfil, aporte: 0, saldoInicial: 0 };
-  d.rendas = []; d.rendasPontuais = []; d.recorrentes = []; d.pontuais = [];
+  d.rendas = []; d.rendasPontuais = []; d.recorrentes = []; d.pontuais = []; d.investimentos = [];
   return d;
 }
 function normalizar(d) {
@@ -703,6 +860,7 @@ function normalizar(d) {
   ['aporte','saldoInicial','taxaMensal','crescimentoAporte','inflacao'].forEach(k => p[k] = num(p[k]));
   if (!validoYm(p.inicio)) p.inicio = hojeYm;
   p.nome = String(p.nome == null ? '' : p.nome).slice(0, 60);
+  p.usarCarteira = p.usarCarteira === true || String(p.usarCarteira).toLowerCase() === 'true';
   const cor = c => /^#[0-9a-f]{6}$/i.test(String(c)) ? c : '#9A9A95';
   let categorias = Array.isArray(d.categorias) && d.categorias.length ? d.categorias : base.categorias;
   categorias = categorias.map(c => ({ id: String(c.id || uid()), nome: String(c.nome || 'Categoria'), cor: cor(c.cor) }));
@@ -720,7 +878,12 @@ function normalizar(d) {
     metas: (Array.isArray(d.metas) ? d.metas : base.metas).map(m => ({ id: String(m.id || uid()), nome: String(m.nome || 'Meta'), valor: num(m.valor), anos: num(m.anos) || 1 })),
     categorias,
     recorrentes: (Array.isArray(d.recorrentes) ? d.recorrentes : []).map(x => ({ id: String(x.id || uid()), catId: catOk(x.catId), descricao: String(x.descricao || ''), valor: num(x.valor), inicio: validoYm(x.inicio) ? x.inicio : '', fim: validoYm(x.fim) ? x.fim : '' })),
-    pontuais: (Array.isArray(d.pontuais) ? d.pontuais : []).map(x => ({ id: String(x.id || uid()), mes: validoYm(x.mes) ? x.mes : hojeYm, catId: catOk(x.catId), descricao: String(x.descricao || ''), valor: num(x.valor) }))
+    pontuais: (Array.isArray(d.pontuais) ? d.pontuais : []).map(x => ({ id: String(x.id || uid()), mes: validoYm(x.mes) ? x.mes : hojeYm, catId: catOk(x.catId), descricao: String(x.descricao || ''), valor: num(x.valor) })),
+    investimentos: (Array.isArray(d.investimentos) ? d.investimentos : []).filter(x => x && String(x.ativo || '').trim()).map(x => {
+      const tipo = TIPOS_INV[x.tipo] ? x.tipo : 'outro', manual = manualInv(tipo);
+      const ativo = String(x.ativo).trim().slice(0, 40);
+      return { id: String(x.id || uid()), tipo, ativo: manual ? ativo : ativo.toUpperCase().replace(/\s+/g, ''), quantidade: manual ? 1 : num(x.quantidade), precoMedio: num(x.precoMedio), valorManual: manual ? num(x.valorManual) : 0 };
+    })
   };
 }
 
@@ -759,7 +922,7 @@ const Banco = {
     const agora = Date.now();
     if (!forcar && agora - this.ultimaCopia < 6 * 3600 * 1000) return false;
     this.ultimaCopia = agora;
-    const resumo = { rendas: d.rendas.length + d.rendasPontuais.length, gastos: d.recorrentes.length + d.pontuais.length, metas: d.metas.length };
+    const resumo = { rendas: d.rendas.length + d.rendasPontuais.length, gastos: d.recorrentes.length + d.pontuais.length, metas: d.metas.length, inv: (d.investimentos || []).length };
     await this.tx('copias', 'readwrite', s => s.put({ em: agora, motivo, resumo, dados: JSON.parse(JSON.stringify(d)) }, agora));
     const chaves = await this.tx('copias', 'readonly', s => s.getAllKeys()) || [];
     const sobra = chaves.sort((a, b) => a - b).slice(0, Math.max(0, chaves.length - 60));
@@ -780,38 +943,43 @@ const Armazenamento = {
     salvar(d) { try { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(d)); return true; } catch (e) { return false; } }
   },
   planilha: {
-    async chamar(acao, dados) {
+    async chamar(acao, dados, extra) {
       if (!conexao.url) throw new Error('Cole a URL do Apps Script primeiro.');
       let resp;
       try {
         resp = await fetch(conexao.url, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ acao, token: conexao.token, dados })
+          body: JSON.stringify({ acao, token: conexao.token, dados, ...(extra || {}) })
         });
       } catch (e) {
         throw new Error('Não foi possível alcançar a planilha. Confira a URL e se a implantação está liberada para "Qualquer pessoa". Dentro do Claude, conexões externas ficam bloqueadas.');
       }
       let j;
       try { j = await resp.json(); } catch (e) { throw new Error('A planilha respondeu algo inesperado. Confira se a URL termina em /exec.'); }
-      if (!j.ok) throw new Error(j.erro || 'A planilha recusou o pedido.');
+      if (!j.ok) {
+        const msg = /desconhecida/i.test(j.erro || '') ? 'O código da planilha está desatualizado. Cole o novo apps-script/Codigo.gs no Apps Script e publique uma nova versão da implantação.' : (j.erro || 'A planilha recusou o pedido.');
+        const err = new Error(msg); err.resposta = j; throw err;
+      }
       return j;
     },
-    async ler() { return (await this.chamar('ler')).dados; },
-    async salvar(d) { return this.chamar('salvar', d); }
+    async ler() { const j = await this.chamar('ler'); return { ...j.dados, atualizadoEm: num(j.atualizadoEm) || num(j.dados && j.dados.atualizadoEm) }; },
+    async salvar(d, forcar) { return this.chamar('salvar', d, { forcar: !!forcar }); },
+    async cotacoes(lista) { return (await this.chamar('cotacoes', null, { lista })).cotacoes || {}; }
   }
 };
 
-let conexao = { url: CONFIG.SHEETS_URL, token: '', auto: false };
+let conexao = { url: CONFIG.SHEETS_URL, token: '', brapi: '' };
 try { const c = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY + ':conexao') || 'null'); if (c) conexao = { ...conexao, ...c }; } catch (e) {}
 function salvarConexao() { try { localStorage.setItem(CONFIG.STORAGE_KEY + ':conexao', JSON.stringify(conexao)); } catch (e) {} }
 
 let state = normalizar(Armazenamento.local.ler() || dadosExemplo());
 if (!Armazenamento.local.ler()) state.exemplo = true;
 let anoSel = (() => { const [y, m] = state.perfil.inicio.split('-').map(Number); return m >= 10 ? y + 1 : y; })();
-let ultimoSalvo = null, salvarTimer = null, planilhaTimer = null;
+let ultimoSalvo = null, salvarTimer = null;
 
 function agendarSalvar() {
+  if (Sync.ativo()) Sync.sujo = true;
   clearTimeout(salvarTimer);
   salvarTimer = setTimeout(async () => {
     state.exemplo = false; // qualquer edição transforma o exemplo em dados seus
@@ -821,7 +989,7 @@ function agendarSalvar() {
     Banco.copiar(state, 'automática', false);
     ultimoSalvo = new Date();
     setEstado(okBanco ? 'Salvo no aparelho às ' + horario(ultimoSalvo) : okLocal ? 'Salvo neste navegador às ' + horario(ultimoSalvo) : 'Não foi possível salvar aqui. Use o backup em JSON.');
-    if (conexao.auto && conexao.url) { clearTimeout(planilhaTimer); planilhaTimer = setTimeout(() => salvarPlanilha(true), 1500); }
+    Sync.agendarEnvio();
   }, 400);
 }
 const horario = d => d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
@@ -902,16 +1070,347 @@ function aporteNoMes(ym) {
   return num(state.perfil.aporte) * Math.pow(1 + num(state.perfil.crescimentoAporte) / 100, Math.floor((k - 1) / 12));
 }
 
+
+/* =========================================================================
+   Investimentos e cotações
+   ========================================================================= */
+function sincronizarSaldo() {
+  // "Usar o total da minha carteira": o saldo inicial da simulação acompanha a carteira.
+  if (state.perfil.usarCarteira) state.perfil.saldoInicial = Math.round(carteira().total * 100) / 100;
+}
+function fmtPreco(v) {
+  if (!isFinite(v)) return '—';
+  return Math.abs(v) >= 1000 ? brl(v) : Math.abs(v) >= 1 ? brl2(v) : 'R$ ' + v.toLocaleString('pt-BR', { maximumSignificantDigits: 4 });
+}
+const sinal = (v, f) => (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v));
+const corVar = v => v > 0.0001 ? 'ok-t' : v < -0.0001 ? 'bad-t' : '';
+function fmtQtd(inv) {
+  const q = num(inv.quantidade);
+  const t = q.toLocaleString('pt-BR', { maximumFractionDigits: inv.tipo === 'cripto' ? 8 : 4 });
+  return inv.tipo === 'cripto' ? t + ' ' + inv.ativo : t + (inv.tipo === 'fii' ? (q === 1 ? ' cota' : ' cotas') : (q === 1 ? ' ação' : ' ações'));
+}
+
+function carteira() {
+  const itens = state.investimentos.map(inv => {
+    const manual = manualInv(inv.tipo);
+    const custo = manual ? num(inv.precoMedio) : num(inv.quantidade) * num(inv.precoMedio);
+    const cot = manual ? null : Cotacoes.cache[chaveCot(inv)];
+    const preco = cot && cot.preco > 0 ? cot.preco : null;
+    const valor = manual ? num(inv.valorManual) : preco != null ? num(inv.quantidade) * preco : custo; // sem cotação: vale o custo
+    const varDiaPct = cot && cot.varDia != null && isFinite(cot.varDia) ? cot.varDia : null;
+    const varDiaR = varDiaPct != null ? valor - valor / (1 + varDiaPct / 100) : 0;
+    return { ...inv, manual, custo, preco, valor, cot, semCotacao: !manual && preco == null, varDiaPct, varDiaR,
+      resultado: valor - custo, resultadoPct: custo > 0 ? (valor / custo - 1) * 100 : null };
+  });
+  const total = itens.reduce((a, i) => a + i.valor, 0), custo = itens.reduce((a, i) => a + i.custo, 0);
+  const varDia = itens.reduce((a, i) => a + i.varDiaR, 0);
+  const porTipo = {}; itens.forEach(i => { porTipo[i.tipo] = (porTipo[i.tipo] || 0) + i.valor; });
+  return { itens, total, custo, varDia, varDiaPct: total - varDia > 0 ? varDia / (total - varDia) * 100 : 0, resultado: total - custo, resultadoPct: custo > 0 ? (total / custo - 1) * 100 : 0, porTipo };
+}
+
+const CRIPTO_IDS = { BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', BNB: 'binancecoin', XRP: 'ripple', ADA: 'cardano', DOGE: 'dogecoin', USDT: 'tether', USDC: 'usd-coin',
+  DOT: 'polkadot', LINK: 'chainlink', AVAX: 'avalanche-2', LTC: 'litecoin', TRX: 'tron', SHIB: 'shiba-inu', TON: 'the-open-network', ATOM: 'cosmos', UNI: 'uniswap',
+  XLM: 'stellar', POL: 'polygon-ecosystem-token', MATIC: 'matic-network', BCH: 'bitcoin-cash', NEAR: 'near', APT: 'aptos', ARB: 'arbitrum', OP: 'optimism', PEPE: 'pepe',
+  SUI: 'sui', HBAR: 'hedera-hashgraph', ETC: 'ethereum-classic', AAVE: 'aave', FIL: 'filecoin', ICP: 'internet-computer', RENDER: 'render-token', INJ: 'injective-protocol' };
+
+async function buscarJson(url) {
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const t = ctrl ? setTimeout(() => ctrl.abort(), 12000) : null;
+  try {
+    const r = await fetch(url, ctrl ? { signal: ctrl.signal } : {});
+    if (r.status === 429) throw new Error('muitas consultas seguidas, tente em 1 minuto');
+    if (!r.ok) throw new Error('resposta ' + r.status);
+    return await r.json();
+  } finally { if (t) clearTimeout(t); }
+}
+
+const Cotacoes = {
+  cache: {}, ids: {}, em: 0, tentativa: 0, tentadas: new Set(), carregando: false, aviso: '',
+  ler() {
+    try { const c = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEY + ':cotacoes') || '{}'); this.cache = c.cache || {}; this.ids = c.ids || {}; this.em = c.em || 0; } catch (e) {}
+  },
+  gravar() { try { localStorage.setItem(CONFIG.STORAGE_KEY + ':cotacoes', JSON.stringify({ cache: this.cache, ids: this.ids, em: this.em })); } catch (e) {} },
+  lista() { return Array.from(new Set(state.investimentos.filter(i => !manualInv(i.tipo) && i.ativo).map(chaveCot))); },
+  async atualizar(forcar) {
+    const lista = this.lista();
+    if (!lista.length || this.carregando) return;
+    const faltando = lista.some(k => !this.cache[k]);
+    const novos = lista.some(k => !this.cache[k] && !this.tentadas.has(k)); // ativo recém-cadastrado (aqui ou em outro aparelho)
+    if (!forcar && !faltando && Date.now() - this.em < CONFIG.COTACAO_VALIDADE_MS) return;
+    if (!forcar && !novos && Date.now() - this.tentativa < 60 * 1000) return; // no automático, no máximo 1 busca por minuto
+    this.tentativa = Date.now(); lista.forEach(k => this.tentadas.add(k)); this.carregando = true; renderCarteira();
+    const achou = {}, erros = [];
+    const cripto = lista.filter(k => k.startsWith('CRIPTO:'));
+    if (cripto.length) { try { Object.assign(achou, await this.coingecko(cripto.map(k => k.slice(7)))); } catch (e) { erros.push('CoinGecko: ' + e.message); } }
+    let faltam = lista.filter(k => !achou[k]);
+    if (faltam.length && Sync.ativo()) { try { Object.assign(achou, await Armazenamento.planilha.cotacoes(faltam)); } catch (e) { erros.push('Planilha: ' + e.message); } }
+    faltam = lista.filter(k => !achou[k] && k.startsWith('B3:'));
+    for (const k of faltam) { // brapi: plano gratuito = 1 ativo por consulta
+      try { const r = await this.brapi(k.slice(3)); if (r) achou[k] = r; } catch (e) { erros.push('brapi.dev: ' + e.message); break; }
+    }
+    const agora = Date.now();
+    Object.keys(achou).forEach(k => { this.cache[k] = { ...achou[k], em: agora }; });
+    if (Object.keys(achou).length) this.em = agora;
+    const sem = lista.filter(k => !achou[k]).map(k => k.split(':')[1]);
+    this.aviso = !sem.length ? '' : 'Sem cotação agora para ' + sem.join(', ') + '. ' +
+      (sem.some(t => lista.includes('B3:' + t)) && !Sync.ativo() && !conexao.brapi ? 'Para ações e FIIs, conecte a planilha em Ajustes (Google Finance) ou informe um token da brapi.dev.' :
+       erros.length ? 'Confira o código do ativo. (' + erros[0] + ')' : 'Confira se o código do ativo está certo.');
+    this.carregando = false; this.gravar(); renderDerivados();
+  },
+  async coingecko(simbolos) {
+    const ids = {};
+    for (const s of simbolos) {
+      let id = CRIPTO_IDS[s] || this.ids[s];
+      if (!id) {
+        const r = await buscarJson('https://api.coingecko.com/api/v3/search?query=' + encodeURIComponent(s));
+        const c = (r.coins || []).find(x => String(x.symbol).toUpperCase() === s);
+        if (c) { id = c.id; this.ids[s] = id; }
+      }
+      if (id) ids[s] = id;
+    }
+    const lista = Array.from(new Set(Object.values(ids)));
+    if (!lista.length) return {};
+    const r = await buscarJson('https://api.coingecko.com/api/v3/simple/price?vs_currencies=brl&include_24hr_change=true&ids=' + lista.join(','));
+    const out = {};
+    Object.keys(ids).forEach(s => { const v = r[ids[s]]; if (v && v.brl > 0) out['CRIPTO:' + s] = { preco: v.brl, varDia: isFinite(v.brl_24h_change) ? v.brl_24h_change : null, fonte: 'CoinGecko' }; });
+    return out;
+  },
+  async brapi(t) {
+    const r = await buscarJson('https://brapi.dev/api/quote/' + encodeURIComponent(t) + (conexao.brapi ? '?token=' + encodeURIComponent(conexao.brapi) : ''));
+    const q = r.results && r.results[0];
+    return q && q.regularMarketPrice > 0 ? { preco: q.regularMarketPrice, varDia: isFinite(q.regularMarketChangePercent) ? q.regularMarketChangePercent : null, fonte: 'brapi.dev' } : null;
+  }
+};
+Cotacoes.ler();
+
+function linhaPos(i) {
+  const det = i.manual ? (i.custo > 0 ? 'aplicado ' + brl2(i.custo) : 'valor informado por você')
+    : fmtQtd(i) + ' · ' + (i.preco != null ? fmtPreco(i.preco) : 'sem cotação');
+  const pm = !i.manual && num(i.precoMedio) > 0 ? 'preço médio ' + fmtPreco(num(i.precoMedio)) : '';
+  const dia = i.varDiaPct != null ? sinal(i.varDiaPct, v => pct(v, 2)) + (i.tipo === 'cripto' ? ' em 24h' : ' hoje') : '';
+  const tot = !i.semCotacao && i.resultadoPct != null && i.custo > 0 ? sinal(i.resultado, brl2) + ' (' + sinal(i.resultadoPct, v => pct(v, 1)) + ')' : '';
+  return `<button class="pos" data-acao="editar-inv" data-id="${esc(i.id)}" aria-label="Editar ${esc(i.ativo)}">
+    <span class="pos-esq"><b>${esc(i.ativo)}</b><small>${det}</small>${pm ? `<small>${pm}</small>` : ''}</span>
+    <span class="pos-dir"><b>${brl2(i.valor)}</b>${dia ? `<small class="${corVar(i.varDiaPct)}">${dia}</small>` : ''}${tot ? `<small class="${corVar(i.resultado)}">${tot}</small>` : ''}</span></button>`;
+}
+
+function renderCarteira() {
+  const box = $('#cardCarteira'); if (!box) return;
+  const c = carteira(), tem = c.itens.length > 0;
+  const quando = Cotacoes.em ? new Date(Cotacoes.em) : null;
+  const status = Cotacoes.carregando ? 'Atualizando cotações…' : quando ? 'Cotações de ' + (quando.toDateString() === new Date().toDateString() ? 'hoje às ' + horario(quando) : quando.toLocaleDateString('pt-BR') + ' ' + horario(quando)) : (c.itens.some(i => !i.manual) ? 'Cotações ainda não buscadas' : 'Sem ativos com cotação');
+  box.innerHTML = `
+    <div class="rot-p">Patrimônio investido</div>
+    <div class="grande">${brl2(c.total)}</div>
+    <div class="rot-p" style="margin-top:2px">${tem ? 'você aplicou ' + brl2(c.custo) : 'adicione seus investimentos para acompanhar'}</div>
+    <div class="div"></div>
+    <div class="par">
+      <div><small>Variação hoje</small><b class="${corVar(c.varDia)}">${sinal(c.varDia, brl2)}</b><small>${sinal(c.varDiaPct, v => pct(v, 2))}</small></div>
+      <div><small>Resultado total</small><b class="${corVar(c.resultado)}">${sinal(c.resultado, brl2)}</b><small>${sinal(c.resultadoPct, v => pct(v, 1))}</small></div>
+    </div>
+    <div class="rodape"><span id="cotStatus">${status}</span><button data-acao="atualizar-cotacoes" ${Cotacoes.carregando || !c.itens.some(i => !i.manual) ? 'disabled' : ''}>Atualizar</button></div>`;
+
+  $('#painelDist').hidden = !tem;
+  const tipos = Object.keys(TIPOS_INV).filter(t => c.porTipo[t] > 0);
+  $('#faixaInv').innerHTML = c.total > 0 ? tipos.map(t => `<i style="width:${(c.porTipo[t] / c.total * 100).toFixed(2)}%;background:${TIPOS_INV[t].cor}" title="${TIPOS_INV[t].nome}"></i>`).join('') : '';
+  $('#distInv').innerHTML = tipos.map(t => `<div class="ln"><span><i class="sw" style="background:${TIPOS_INV[t].cor}"></i>${TIPOS_INV[t].nome}<em>${pct(c.porTipo[t] / c.total * 100, 0)}</em></span><b>${brl2(c.porTipo[t])}</b></div>`).join('');
+
+  const listas = $('#listasInv');
+  if (!tem) {
+    listas.innerHTML = `<div class="painel vazio-inv"><h3>Nenhum investimento ainda</h3>
+      <p>Cadastre o código do ativo (PETR4, MXRF11, BTC…), quantas cotas tem e o preço médio. O app busca a cotação e calcula quanto vale hoje.</p>
+      <button class="btn" data-acao="novo-inv">+ Adicionar investimento</button></div>`;
+  } else {
+    listas.innerHTML = (Cotacoes.aviso && !Cotacoes.carregando ? `<div class="aviso-cot" role="status">${esc(Cotacoes.aviso)}</div>` : '') +
+      Object.keys(TIPOS_INV).map(t => {
+        const its = c.itens.filter(i => i.tipo === t).sort((a, b) => b.valor - a.valor);
+        if (!its.length) return '';
+        return `<div class="painel"><div class="cab"><h3 class="tit-ico"><i class="sw" style="background:${TIPOS_INV[t].cor};width:12px;height:12px"></i>${TIPOS_INV[t].nome}</h3>
+          <button class="btn sec peq" data-acao="novo-inv" data-tipo="${t}">+ Adicionar</button></div>
+          <div>${its.map(linhaPos).join('')}</div></div>`;
+      }).join('');
+  }
+
+  // Resumo (tela inicial)
+  const rc = $('#resCarteira');
+  rc.innerHTML = !tem ? '<p class="vazio">Nenhum investimento cadastrado. <a href="#carteira" data-tab="carteira" class="lnk">Adicionar</a></p>'
+    : `<div class="ln"><span>Total investido</span><b>${brl2(c.total)}</b></div>
+       <div class="ln"><span>Variação hoje</span><b class="${corVar(c.varDia)}">${sinal(c.varDia, brl2)} (${sinal(c.varDiaPct, v => pct(v, 2))})</b></div>` +
+      c.itens.slice().sort((a, b) => b.valor - a.valor).slice(0, 4).map(i =>
+        `<div class="ln"><span><i class="sw" style="background:${TIPOS_INV[i.tipo].cor}"></i>${esc(i.ativo)}${i.varDiaPct != null ? `<em class="${corVar(i.varDiaPct)}">${sinal(i.varDiaPct, v => pct(v, 1))}</em>` : ''}</span><b>${brl2(i.valor)}</b></div>`).join('');
+
+  const ck = $('#usarCarteiraTxt');
+  if (ck) ck.textContent = 'Usar o total da minha carteira de investimentos' + (tem ? ' (' + brl(c.total) + ')' : '');
+  if (state.perfil.usarCarteira && document.activeElement !== $('#f-saldo')) $('#f-saldo').value = fmtNum(num(state.perfil.saldoInicial));
+}
+
+/* Formulário de investimento (abre por cima da tela) */
+const dlg = () => $('#dlgInv');
+function abrirInv(id, tipo) {
+  const inv = id ? state.investimentos.find(x => x.id === id) : null;
+  const d = dlg(); d.dataset.id = inv ? inv.id : '';
+  $('#dlgTit').textContent = inv ? 'Editar ' + inv.ativo : 'Novo investimento';
+  $('#tiposInv').innerHTML = Object.keys(TIPOS_INV).map(t => `<button type="button" role="radio" data-tipo-inv="${t}">${TIPOS_INV[t].curto}</button>`).join('');
+  $('#i-ativo').value = inv ? inv.ativo : '';
+  $('#i-qtd').value = inv && !manualInv(inv.tipo) ? fmtNum(num(inv.quantidade), 8) : '';
+  $('#i-pm').value = inv && !manualInv(inv.tipo) && num(inv.precoMedio) ? num(inv.precoMedio).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 8 }) : '';
+  $('#i-aplicado').value = inv && manualInv(inv.tipo) ? fmtNum(num(inv.precoMedio)) : '';
+  $('#i-atual').value = inv && manualInv(inv.tipo) ? fmtNum(num(inv.valorManual)) : '';
+  $('#i-excluir').hidden = !inv;
+  tipoInv(inv ? inv.tipo : (TIPOS_INV[tipo] ? tipo : 'acao'));
+  if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+  if (!inv) $('#i-ativo').focus();
+}
+function fecharInv() { const d = dlg(); if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); }
+function tipoInv(t) {
+  const d = dlg(); d.dataset.tipo = t;
+  $$('[data-tipo-inv]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.tipoInv === t)));
+  const manual = manualInv(t);
+  $('#i-mercado').hidden = manual; $('#i-manual').hidden = !manual;
+  $('#i-ativo-rot').textContent = manual ? 'Nome' : t === 'cripto' ? 'Símbolo da moeda' : 'Código na B3';
+  $('#i-ativo').placeholder = 'Ex.: ' + TIPOS_INV[t].ex;
+  $('#i-ativo').setAttribute('autocapitalize', manual ? 'sentences' : 'characters');
+  $('#i-ativo-dica').textContent = t === 'acao' ? 'Ações, ETFs e BDRs da B3: PETR4, ITUB4, BOVA11, IVVB11…' : t === 'fii' ? 'Fundos imobiliários: MXRF11, HGLG11, KNRI11…'
+    : t === 'cripto' ? 'BTC, ETH, SOL, USDT… O preço é em reais.' : t === 'rf' ? 'Tesouro Direto, CDB, LCI, LCA. Atualize o valor atual quando quiser.' : 'Previdência, poupança, conta remunerada…';
+  $('#i-qtd-rot').textContent = t === 'cripto' ? 'Quantidade (pode ter vírgula)' : t === 'fii' ? 'Quantidade de cotas' : 'Quantidade';
+  previaInv();
+}
+function previaInv() {
+  const d = dlg(), t = d.dataset.tipo, box = $('#i-previa');
+  if (manualInv(t)) {
+    const ap = num($('#i-aplicado').value), at = num($('#i-atual').value);
+    box.innerHTML = ap > 0 && at > 0 ? `Rendimento até agora: <b class="${corVar(at - ap)}">${sinal(at - ap, brl2)} (${sinal((at / ap - 1) * 100, v => pct(v, 1))})</b>` : 'Informe quanto aplicou e quanto vale hoje (está no app do banco ou da corretora).';
+    return;
+  }
+  const ativo = $('#i-ativo').value.trim().toUpperCase().replace(/\s+/g, '');
+  const q = num($('#i-qtd').value), pm = num($('#i-pm').value);
+  const cot = ativo ? Cotacoes.cache[(t === 'cripto' ? 'CRIPTO:' : 'B3:') + ativo] : null;
+  const partes = [];
+  if (q > 0 && pm > 0) partes.push(`Você aplicou <b>${brl2(q * pm)}</b>`);
+  if (cot && cot.preco > 0) partes.push(`cotação ${fmtPreco(cot.preco)}${q > 0 ? ` · vale <b>${brl2(q * cot.preco)}</b> hoje` : ''}`);
+  else if (ativo) partes.push('a cotação é buscada quando você salvar');
+  box.innerHTML = partes.length ? partes.join(' · ') : 'O preço médio está na nota da corretora ou no app dela. Se não souber, use o preço do dia da compra.';
+}
+function salvarInv() {
+  const d = dlg(), tipo = d.dataset.tipo, manual = manualInv(tipo);
+  const campoAtivo = $('#i-ativo');
+  let ativo = campoAtivo.value.trim();
+  if (!manual) ativo = ativo.toUpperCase().replace(/\s+/g, '').replace(/\.SA$/, '');
+  if (!ativo) { campoAtivo.focus(); campoAtivo.setAttribute('aria-invalid', 'true'); return; }
+  campoAtivo.removeAttribute('aria-invalid');
+  if (!manual && !(num($('#i-qtd').value) > 0)) { $('#i-qtd').focus(); return; }
+  const item = { id: d.dataset.id || uid(), tipo, ativo: ativo.slice(0, 40),
+    quantidade: manual ? 1 : num($('#i-qtd').value), precoMedio: manual ? num($('#i-aplicado').value) : num($('#i-pm').value), valorManual: manual ? num($('#i-atual').value) : 0 };
+  const i = state.investimentos.findIndex(x => x.id === item.id);
+  if (i >= 0) state.investimentos[i] = item; else state.investimentos.push(item);
+  fecharInv(); renderDerivados(); agendarSalvar();
+  if (!manual && !Cotacoes.cache[chaveCot(item)]) Cotacoes.atualizar(true);
+}
+
+/* =========================================================================
+   Sincronização celular ⇄ site (pela planilha do Google)
+   Vence a alteração mais recente. Antes de trocar os dados deste aparelho,
+   uma cópia de segurança é guardada (aba Ajustes → cópias).
+   ========================================================================= */
+const Sync = {
+  estado: 'off', msg: '', ocupado: false, sujo: false, timer: null,
+  ativo() { return !!(conexao.url && conexao.token); },
+  marcar(estado, msg) { this.estado = estado; this.msg = msg || ''; renderSync(); },
+  ok() { this.marcar('ok', 'Sincronizado às ' + horario(new Date()) + '. Celular e site estão com os mesmos dados.'); },
+  agendarEnvio() {
+    if (!this.ativo()) return;
+    this.sujo = true; clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.enviar(false), 1200);
+  },
+  async enviar(forcar) {
+    if (!this.ativo()) return;
+    if (this.ocupado) { this.agendarEnvio(); return; }
+    this.ocupado = true; let conflito = false;
+    this.marcar('indo', 'Enviando alterações para a planilha…');
+    try { await Armazenamento.planilha.salvar(state, forcar); this.sujo = false; this.ok(); }
+    catch (e) { if (e.resposta && e.resposta.conflito) conflito = true; else this.marcar('erro', e.message); }
+    this.ocupado = false;
+    if (conflito) { this.sujo = false; await this.puxar(true); }
+  },
+  async puxar(forcarLeitura, primeira) {
+    if (!this.ativo() || this.ocupado) return;
+    if (this.sujo) return this.enviar(false);
+    const foco = document.activeElement;
+    if (!forcarLeitura && foco && /^(INPUT|TEXTAREA|SELECT)$/.test(foco.tagName) && foco.type !== 'checkbox') return; // não atrapalha quem está digitando
+    this.ocupado = true; let enviar = false;
+    if (forcarLeitura) this.marcar('indo', 'Lendo a planilha…');
+    try {
+      const v = await Armazenamento.planilha.chamar('versao');
+      const remota = num(v.atualizadoEm), local = num(state.atualizadoEm);
+      if (v.temDados && (forcarLeitura || state.exemplo || remota > local)) {
+        aplicarRemoto(await Armazenamento.planilha.ler(), primeira);
+      } else if (!state.exemplo && (!v.temDados || remota < local)) enviar = true;
+      if (!enviar) this.ok();
+    } catch (e) { this.marcar('erro', e.message); }
+    this.ocupado = false;
+    if (enviar) await this.enviar(false);
+  }
+};
+function aplicarRemoto(d, primeira) {
+  if (!d || !d.perfil || !Object.keys(d.perfil).length) return;
+  Banco.copiar(state, primeira ? 'antes de conectar à planilha' : 'antes de receber da planilha', !!primeira);
+  const aba = ABAS.find(n => !$('#v-' + n).hidden);
+  state = normalizar({ ...d, exemplo: false, atualizadoEm: num(d.atualizadoEm) || Date.now() });
+  Armazenamento.local.salvar(state);
+  if (Banco.ok) Banco.salvar(state);
+  renderCampos(); renderEditores(); renderDerivados(); renderDadosAba();
+  if (aba) irPara(aba, true);
+  setEstado('Atualizado com a planilha às ' + horario(new Date()));
+  Cotacoes.atualizar(false);
+}
+function codigoConexao() { try { return btoa(unescape(encodeURIComponent(JSON.stringify({ u: conexao.url, t: conexao.token })))); } catch (e) { return ''; } }
+function lerCodigo(txt) {
+  try {
+    const s = String(txt || '').trim().replace(/^.*#conectar=/, '').replace(/\s+/g, '');
+    const o = JSON.parse(decodeURIComponent(escape(atob(s))));
+    if (o && /^https:\/\/script\.google(usercontent)?\.com\//.test(o.u) && o.t) return { url: o.u, token: String(o.t) };
+  } catch (e) {}
+  return null;
+}
+async function conectar(url, token) {
+  if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) { Sync.marcar('erro', 'A URL precisa começar com https://script.google.com/ e terminar em /exec.'); return; }
+  if (!token) { Sync.marcar('erro', 'Informe o token definido no Apps Script.'); return; }
+  conexao = { ...conexao, url, token }; salvarConexao();
+  Sync.marcar('indo', 'Conectando à planilha…');
+  try {
+    const v = await Armazenamento.planilha.chamar('versao');
+    if (v.temDados) { aplicarRemoto(await Armazenamento.planilha.ler(), true); Sync.marcar('ok', 'Conectado. Este aparelho agora usa os dados da planilha (o que havia aqui ficou nas cópias de segurança).'); }
+    else { await Sync.enviar(true); if (Sync.estado === 'ok') Sync.marcar('ok', 'Conectado. Seus dados foram enviados para a planilha. Agora conecte o outro aparelho com o código abaixo.'); }
+    Cotacoes.tentativa = 0; Cotacoes.atualizar(true); // agora as ações e FIIs podem vir do Google Finance da planilha
+  } catch (e) { conexao = { ...conexao, url: '', token: '' }; salvarConexao(); Sync.marcar('erro', 'Não conectou: ' + e.message); }
+  renderDadosAba();
+}
+function renderSync() {
+  const pill = $('#syncPill'), st = $('#statusPlanilha'), av = $('#avatar');
+  if (!pill) return;
+  const on = Sync.ativo();
+  const est = on ? Sync.estado : 'off';
+  pill.className = 'sync-pill ' + est;
+  pill.textContent = !on ? 'Desligada' : est === 'ok' ? 'Sincronizado' : est === 'indo' ? 'Sincronizando' : est === 'erro' ? 'Com erro' : 'Conectada';
+  st.className = 'status' + (est === 'ok' ? ' ok' : est === 'erro' ? ' bad' : '');
+  st.textContent = Sync.msg || (on ? 'Conectada à planilha.' : 'Sem planilha conectada. Os dados ficam só neste aparelho; o celular e o site não se enxergam.');
+  av.dataset.sync = on ? est : '';
+  $('#syncConectado').hidden = !on; $('#syncDesconectado').hidden = on;
+  $('#c-codigo').value = on ? codigoConexao() : '';
+}
+
 /* =========================================================================
    Renderização — partes que dependem dos números
    ========================================================================= */
 function renderTudo() { renderCampos(); renderEditores(); renderDerivados(); renderDadosAba(); }
 
 function renderDerivados() {
+  sincronizarSaldo();
   const c = calcular();
   $('#f-renda').value = fmtNum(rendaRef());
   renderAvatar();
   renderResumo(c);
+  renderCarteira();
   renderTopo(c);
   renderVeredito(c);
   renderCards(c);
@@ -967,13 +1466,14 @@ function renderResumo(c) {
     cm.innerHTML = `<div class="rot-p">Meta principal</div><div class="grande">Defina sua meta</div><button class="link" data-tab="metas">Criar meta →</button>`;
   } else {
     const decorrido = Math.max(0, Math.min(c.N, ymIdx(hojeYm) - ymIdx(state.perfil.inicio)));
-    const hoje = c.proj.saldo[decorrido];
+    const cart = carteira(), real = cart.itens.length > 0;
+    const hoje = real ? cart.total : c.proj.saldo[decorrido];
     const prog = principal.valor > 0 ? Math.min(100, hoje / principal.valor * 100) : 100;
     const chega = principal.ate == null ? 'não atinge' : principal.ate === 0 ? 'já atingida' : ymRot(somaMeses(state.perfil.inicio, principal.ate));
     cm.innerHTML = `
       <div class="topo-p"><span class="rot-p">${esc(principal.nome)}</span><span class="pill ${principal.ok ? 'ok' : 'bad'}">${principal.ok ? 'No caminho' : 'Fora do prazo'}</span></div>
       <div class="grande">${brl(hoje)}</div>
-      <div class="rot-p" style="margin:2px 0 14px">${decorrido > 0 ? 'patrimônio estimado hoje' : 'patrimônio hoje'} · de ${brl(principal.valor)} (${pct(prog, prog < 10 ? 1 : 0)})</div>
+      <div class="rot-p" style="margin:2px 0 14px">${real ? 'sua carteira hoje' : decorrido > 0 ? 'patrimônio estimado hoje' : 'patrimônio hoje'} · de ${brl(principal.valor)} (${pct(prog, prog < 10 ? 1 : 0)})</div>
       <div class="barra" role="img" aria-label="${prog.toFixed(0)}% da meta"><i style="width:${Math.max(prog, 1).toFixed(1)}%"></i></div>
       <div class="div"></div>
       <div class="par"><div><small>Prazo da meta</small><b>${ymRot(principal.prazoYm)}</b></div><div><small>Com seu plano</small><b class="${principal.ate == null ? 'bad-t' : ''}">${chega}</b></div></div>
@@ -997,12 +1497,14 @@ function renderCampos() {
     if (t === 'range') { el.max = Math.max(1000, Math.ceil(Math.max(rendaRef(), num(p.aporte)) / 50) * 50); el.value = num(p[k]); }
     else if (t === 'mes') el.value = p[k];
     else if (t === 'texto') el.value = p[k] || '';
+    else if (t === 'check') el.checked = !!p[k];
     else el.value = fmtNum(num(p[k]));
   });
   $('#f-renda').value = fmtNum(rendaRef());
   $('#c-url').value = conexao.url || '';
   $('#c-token').value = conexao.token || '';
-  $('#c-auto').checked = !!conexao.auto;
+  $('#c-brapi').value = conexao.brapi || '';
+  $('#f-saldo').readOnly = !!p.usarCarteira;
 }
 
 function renderTopo(c) {
@@ -1305,8 +1807,7 @@ function renderEditores() {
 
 const nativo = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 function renderDadosAba() {
-  const s = $('#statusPlanilha');
-  if (!conexao.url) { s.className = 'status'; s.textContent = 'Sem planilha conectada. Os dados ficam salvos no aparelho.'; }
+  renderSync();
   $('#btnBaixar').hidden = window.self !== window.top && !nativo(); // downloads não funcionam dentro do Claude
   $('#btnBaixar').textContent = nativo() ? 'Compartilhar backup' : 'Baixar arquivo';
   const emb = $('#bancoStatus');
@@ -1318,35 +1819,15 @@ function renderDadosAba() {
 async function renderCopias() {
   const box = $('#listaCopias'); if (!box) return;
   const itens = Banco.ok ? await Banco.listarCopias() : [];
-  box.innerHTML = itens.length ? itens.map(c => `<div class="copia"><span><b>${new Date(c.em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</b> · ${esc(c.motivo)} · ${c.resumo.rendas} rendas, ${c.resumo.gastos} gastos, ${c.resumo.metas} metas</span><button class="btn sec peq" data-acao="restaurar-copia" data-em="${c.em}">Restaurar</button></div>`).join('')
+  box.innerHTML = itens.length ? itens.map(c => `<div class="copia"><span><b>${new Date(c.em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}</b> · ${esc(c.motivo)} · ${c.resumo.rendas} rendas, ${c.resumo.gastos} gastos, ${c.resumo.metas} metas${c.resumo.inv ? ', ' + c.resumo.inv + ' investimentos' : ''}</span><button class="btn sec peq" data-acao="restaurar-copia" data-em="${c.em}">Restaurar</button></div>`).join('')
     : '<span class="sub">Nenhuma cópia ainda. A primeira aparece depois que você editar seus dados.</span>';
 }
 
 /* =========================================================================
-   Planilha
+   Planilha — botões manuais (o automático está em Sync)
    ========================================================================= */
-function statusPlanilha(t, tipo) { const s = $('#statusPlanilha'); s.className = 'status' + (tipo ? ' ' + tipo : ''); s.textContent = t; }
-async function salvarPlanilha(silencioso) {
-  if (!silencioso) statusPlanilha('Salvando na planilha…');
-  try {
-    await Armazenamento.planilha.salvar(state);
-    const t = 'Salvo na planilha às ' + horario(new Date());
-    statusPlanilha(t, 'ok'); setEstado(t);
-  } catch (e) { statusPlanilha(e.message, 'bad'); if (silencioso) setEstado('Falha ao salvar na planilha. Veja em Ajustes.'); }
-}
-async function carregarPlanilha() {
-  statusPlanilha('Lendo a planilha…');
-  try {
-    const d = await Armazenamento.planilha.ler();
-    if (!d || !d.perfil || !Object.keys(d.perfil).length) { statusPlanilha('A planilha está vazia. Clique em "Salvar na planilha" para enviar seus dados.', 'bad'); return; }
-    Banco.copiar(state, 'antes de carregar da planilha', true);
-    state = normalizar({ ...d, exemplo: false });
-    Armazenamento.local.salvar(state);
-    renderTudo();
-    statusPlanilha('Dados carregados da planilha às ' + horario(new Date()), 'ok');
-    setEstado('Carregado da planilha às ' + horario(new Date()));
-  } catch (e) { statusPlanilha(e.message, 'bad'); }
-}
+async function salvarPlanilha() { Sync.sujo = false; await Sync.enviar(true); }
+async function carregarPlanilha() { Sync.sujo = false; await Sync.puxar(true, true); }
 
 /* =========================================================================
    Eventos
@@ -1354,6 +1835,7 @@ async function carregarPlanilha() {
 function lerCampo(el) {
   const t = el.dataset.tipo;
   if (t === 'moeda' || t === 'num' || t === 'range') return num(el.value);
+  if (t === 'check') return el.checked;
   return el.value;
 }
 document.addEventListener('input', ev => {
@@ -1362,7 +1844,8 @@ document.addEventListener('input', ev => {
     state.perfil[el.dataset.bind] = el.dataset.tipo === 'mes' ? (validoYm(el.value) ? el.value : state.perfil.inicio) : lerCampo(el);
     if (el.dataset.tipo === 'range') { const t = $('#f-aporte'); t.value = fmtNum(num(el.value)); }
     if (el.id === 'f-aporte' || el.id === 'f-renda') { const r = $('#f-aporte-range'); r.max = Math.max(1000, Math.ceil(Math.max(rendaRef(), num(state.perfil.aporte)) / 50) * 50); r.value = num(state.perfil.aporte); }
-    renderDerivados(); agendarSalvar(); return;
+    if (el.dataset.tipo === 'check') { renderDerivados(); renderCampos(); } else renderDerivados();
+    agendarSalvar(); return;
   }
   if (el.dataset.lista && el.dataset.campo) {
     const item = state[el.dataset.lista].find(x => x.id === el.dataset.id);
@@ -1373,7 +1856,8 @@ document.addEventListener('input', ev => {
     renderDerivados(); agendarSalvar(); return;
   }
   if (el.id === 'f-livre') renderTempoLivre();
-  if (el.id === 'c-url' || el.id === 'c-token') { conexao.url = $('#c-url').value.trim(); conexao.token = $('#c-token').value.trim(); salvarConexao(); }
+  if (el.id === 'c-brapi') { conexao.brapi = el.value.trim(); salvarConexao(); }
+  if (el.closest && el.closest('#formInv')) previaInv();
 });
 document.addEventListener('change', ev => {
   const el = ev.target;
@@ -1381,7 +1865,7 @@ document.addEventListener('change', ev => {
   if (el.id === 'f-livre') el.value = fmtNum(num(el.value));
   if (el.dataset.lista && (el.dataset.campo === 'catId' || el.dataset.lista === 'categorias' || el.dataset.campo === 'mes')) { renderEditores(); renderDerivados(); }
   if (el.id === 'selAno') { anoSel = +el.value; renderOrcamento(); }
-  if (el.id === 'c-auto') { conexao.auto = el.checked; salvarConexao(); }
+  if (el.id === 'c-brapi' && conexao.brapi) Cotacoes.atualizar(true);
   if (el.id === 'arquivoJson' && el.files && el.files[0]) {
     const fr = new FileReader();
     fr.onload = () => aplicarJson(String(fr.result));
@@ -1395,6 +1879,8 @@ function aplicarJson(txt) {
   try { state = normalizar({ ...JSON.parse(txt), exemplo: false }); renderTudo(); agendarSalvar(); st.textContent = 'Dados importados.'; st.className = 'ok-t'; }
   catch (e) { st.textContent = 'JSON inválido. Confira se copiou o conteúdo inteiro.'; st.className = 'bad-t'; }
 }
+document.addEventListener('submit', ev => { if (ev.target.id === 'formInv') { ev.preventDefault(); salvarInv(); } });
+$('#dlgInv').addEventListener('click', ev => { if (ev.target === ev.currentTarget) fecharInv(); }); // toque fora do formulário fecha
 const armados = new Map();
 function confirmar(btn, texto, fn) {
   if (armados.has(btn)) { clearTimeout(armados.get(btn).t); btn.textContent = armados.get(btn).orig; armados.delete(btn); fn(); return; }
@@ -1403,8 +1889,10 @@ function confirmar(btn, texto, fn) {
 }
 
 document.addEventListener('click', ev => {
+  const tipoBtn = ev.target.closest('[data-tipo-inv]');
+  if (tipoBtn) { tipoInv(tipoBtn.dataset.tipoInv); return; }
   const tab = ev.target.closest('[data-tab]');
-  if (tab) { irPara(tab.dataset.tab); return; }
+  if (tab) { ev.preventDefault(); irPara(tab.dataset.tab); return; }
   const b = ev.target.closest('[data-acao]');
   if (!b) return;
   const a = b.dataset.acao;
@@ -1443,8 +1931,32 @@ document.addEventListener('click', ev => {
     case 'copia-agora': Banco.copiar(state, 'manual', true).then(renderCopias); break;
     case 'restaurar-copia': Banco.listarCopias().then(async l => { const c = l.find(x => String(x.em) === b.dataset.em); if (!c) return; await Banco.copiar(state, 'antes de restaurar cópia', true); state = normalizar({ ...c.dados, exemplo: false }); renderTudo(); agendarSalvar(); renderCopias(); }); break;
     case 'instalar': if (adiado) { adiado.prompt(); adiado = null; } else alert('No Chrome do Android: menu ⋮ → Instalar app (ou Adicionar à tela inicial).'); break;
-    case 'planilha-salvar': salvarPlanilha(false); break;
-    case 'planilha-carregar': carregarPlanilha(); break;
+    case 'planilha-salvar': confirmar(b, 'Toque de novo: substitui a planilha', salvarPlanilha); break;
+    case 'planilha-carregar': confirmar(b, 'Toque de novo: substitui este aparelho', carregarPlanilha); break;
+    case 'sync-agora': Sync.puxar(true); break;
+    case 'conectar': conectar($('#c-url').value.trim(), $('#c-token').value.trim()); break;
+    case 'conectar-codigo': {
+      const c = lerCodigo($('#c-colar').value);
+      if (!c) { Sync.marcar('erro', 'Código inválido. Copie o código inteiro em Ajustes do outro aparelho.'); break; }
+      $('#c-colar').value = ''; conectar(c.url, c.token); break;
+    }
+    case 'copiar-codigo': {
+      const box = $('#c-codigo');
+      const ok = () => { b.textContent = 'Copiado!'; setTimeout(() => { b.textContent = 'Copiar'; }, 2000); };
+      const fallback = () => { box.focus(); box.select(); };
+      try { navigator.clipboard.writeText(box.value).then(ok, fallback); } catch (e) { fallback(); }
+      break;
+    }
+    case 'desconectar': confirmar(b, 'Toque de novo para desconectar', () => {
+      conexao = { ...conexao, url: '', token: '' }; salvarConexao(); Sync.sujo = false; Sync.marcar('off', 'Desconectado. Os dados continuam neste aparelho, mas não sincronizam mais.'); renderDadosAba();
+    }); break;
+    case 'novo-inv': abrirInv(null, b.dataset.tipo); break;
+    case 'editar-inv': abrirInv(b.dataset.id); break;
+    case 'fechar-inv': fecharInv(); break;
+    case 'excluir-inv': confirmar(b, 'Toque de novo para excluir', () => {
+      const id = dlg().dataset.id; state.investimentos = state.investimentos.filter(x => x.id !== id); fecharInv(); renderDerivados(); agendarSalvar();
+    }); break;
+    case 'atualizar-cotacoes': Cotacoes.atualizar(true); break;
     case 'json-copiar': {
       const box = $('#jsonBox'), st = $('#jsonStatus');
       const fallback = () => { box.focus(); box.select(); st.textContent = 'Texto selecionado: use Ctrl+C / Cmd+C.'; st.className = 'sub'; };
@@ -1475,8 +1987,8 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && windo
 }
 function focarUltimo(sel) { const els = $$(sel + ' input[type=text]'); if (els.length) els[els.length - 1].focus(); }
 
-/* Abas com endereço (#resumo, #metas, #orcamento, #dados) */
-const ABAS = ['resumo', 'metas', 'orcamento', 'dados'];
+/* Abas com endereço (#resumo, #carteira, #metas, #orcamento, #dados) */
+const ABAS = ['resumo', 'carteira', 'metas', 'orcamento', 'dados'];
 function irPara(nome, semHash) {
   if (!ABAS.includes(nome)) nome = 'resumo';
   ABAS.forEach(n => { $('#v-' + n).hidden = n !== nome; });
@@ -1485,6 +1997,7 @@ function irPara(nome, semHash) {
   renderDerivados(); // redesenha os gráficos com a largura certa
   if (!semHash) window.scrollTo(0, 0);
   if (nome === 'dados') renderCopias();
+  if (nome === 'carteira' || nome === 'resumo') Cotacoes.atualizar(false);
 }
 window.addEventListener('hashchange', () => irPara(location.hash.slice(1), true));
 let rTimer; window.addEventListener('resize', () => { clearTimeout(rTimer); rTimer = setTimeout(renderDerivados, 120); });
@@ -1492,7 +2005,10 @@ let rTimer; window.addEventListener('resize', () => { clearTimeout(rTimer); rTim
 /* Início */
 renderCampos();
 renderEditores();
-irPara(location.hash.slice(1) || 'resumo', true);
+const codigoNoLink = /^#conectar=/.test(location.hash) ? location.hash.slice(10) : '';
+if (codigoNoLink) { try { history.replaceState(null, '', '#dados'); } catch (e) {} }
+irPara(codigoNoLink ? 'dados' : (location.hash.slice(1) || 'resumo'), true);
+if (codigoNoLink && !Sync.ativo()) { $('#c-colar').value = decodeURIComponent(codigoNoLink); Sync.marcar('off', 'Código recebido. Toque em Conectar para usar os mesmos dados do outro aparelho.'); }
 renderDadosAba();
 setEstado(Armazenamento.local.ler() ? 'Dados carregados do aparelho' : 'Dados de exemplo · nada salvo ainda');
 
@@ -1510,10 +2026,21 @@ setEstado(Armazenamento.local.ler() ? 'Dados carregados do aparelho' : 'Dados de
     try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
   }
   renderDadosAba();
+  // Sincronização: ao abrir, ao voltar para o app e a cada 45 s com ele aberto.
+  if (Sync.ativo()) { Sync.marcar('indo', 'Conferindo a planilha…'); await Sync.puxar(false); }
+  Cotacoes.atualizar(false);
+  const voltar = () => { if (document.visibilityState === 'visible') { Sync.puxar(false); Cotacoes.atualizar(false); } };
+  document.addEventListener('visibilitychange', voltar);
+  window.addEventListener('online', voltar);
+  window.addEventListener('focus', voltar);
+  setInterval(() => { if (document.visibilityState === 'visible') Sync.puxar(false); }, CONFIG.SYNC_INTERVALO_MS);
+  setInterval(() => { if (document.visibilityState === 'visible') Cotacoes.atualizar(false); }, CONFIG.COTACAO_VALIDADE_MS);
+  // Antes de sair, tenta mandar o que ainda não foi enviado.
+  window.addEventListener('pagehide', () => { if (Sync.sujo) Sync.enviar(false); });
 })();
 
 // Exposto para testes no console
-window.VidaConfortavel = { projetar, aporteNecessario, mesesAte, calcular, get estado() { return state; } };
+window.VidaConfortavel = { projetar, aporteNecessario, mesesAte, calcular, carteira, Sync, Cotacoes, get estado() { return state; } };
 })();
 </script>
 
