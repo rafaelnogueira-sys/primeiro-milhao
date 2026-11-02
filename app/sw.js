@@ -1,6 +1,6 @@
 /* Primeiro Milhão — service worker: abre o app sem internet.
    Mude VERSAO a cada publicação para os aparelhos pegarem a versão nova. */
-const VERSAO = 'pm-v1';
+const VERSAO = 'pm-v2';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 
 self.addEventListener('install', e => {

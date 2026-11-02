@@ -25,7 +25,7 @@ primeiro-milhao/
 ## Onde os dados ficam
 
 1. **Banco do aparelho (IndexedDB)**: cópia principal. Cada edição é salva na hora, sem internet. O `localStorage` é um espelho; se um dos dois for limpo, o outro restaura.
-2. **Cópias automáticas** no próprio banco: a cada 6 h de uso e antes de apagar, importar, restaurar exemplo ou carregar da planilha. Ficam as 60 mais recentes; restaure na aba **Dados e conexão**.
+2. **Cópias automáticas** no próprio banco: a cada 6 h de uso e antes de apagar, importar, restaurar exemplo ou carregar da planilha. Ficam as 60 mais recentes; restaure na aba **Ajustes**.
 3. **Google Sheets (opcional)**: os dados vão para uma planilha sua, fora do aparelho. É a proteção contra perder o celular ou desinstalar o app. Passo a passo na própria aba.
 4. **Backup em JSON**: no Android, o botão abre o menu de compartilhar (Drive, WhatsApp, e-mail).
 
@@ -72,7 +72,7 @@ Mude o `VERSAO` em `app/sw.js` a cada publicação do site para os aparelhos peg
 
 | O que mudar | Onde (`app/index.html`) |
 |---|---|
-| Cores e fontes | `<style>`, bloco `:root` |
+| Cores e fontes (Montserrat) | link do Google Fonts no `<head>` e bloco `:root` do `<style>` (variável `--f`) |
 | Categorias padrão | `CATEGORIAS_PADRAO` |
 | Taxas da tabela "E se o rendimento mudar?" | `CONFIG.TAXAS_CENARIO` |
 | Dados de exemplo | `dadosExemplo()` |
