@@ -1,0 +1,74 @@
+name: Gerar APK do Android
+
+# Roda ao enviar uma tag (git tag v1.0.0 && git push --tags) ou manualmente em Actions → Run workflow.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Montar projeto Android
+        run: |
+          npm run build:web
+          npx cap add android
+          npx capacitor-assets generate --android
+          npx cap sync android
+
+      - name: Definir versão
+        run: |
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+
+      - name: Compilar APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Assinar APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        run: |
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          UNSIGNED=android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/chave.jks"
+            KS="$RUNNER_TEMP/chave.jks"; PASS="$KEYSTORE_PASSWORD"; AL="$KEY_ALIAS"
+            echo "Assinando com a sua chave."
+          else
+            # Sem chave própria: usa uma chave de teste. Instala normalmente, mas cada build
+            # tem assinatura diferente e o Android não deixa atualizar por cima (precisa desinstalar).
+            keytool -genkeypair -keystore "$RUNNER_TEMP/teste.jks" -storepass android -keypass android -alias teste -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Primeiro Milhao Teste"
+            KS="$RUNNER_TEMP/teste.jks"; PASS=android; AL=teste
+            echo "::warning::Sem KEYSTORE_BASE64: APK assinado com chave de teste. Veja o README para configurar sua chave."
+          fi
+          "$BT/zipalign" -f -p 4 "$UNSIGNED" "$RUNNER_TEMP/alinhado.apk"
+          "$BT/apksigner" sign --ks "$KS" --ks-pass "pass:$PASS" --ks-key-alias "$AL" --out primeiro-milhao.apk "$RUNNER_TEMP/alinhado.apk"
+          "$BT/apksigner" verify primeiro-milhao.apk
+
+      - uses: actions/upload-artifact@v4
+        with: { name: primeiro-milhao-apk, path: primeiro-milhao.apk }
+
+      - name: Publicar em Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v1.{0}', github.run_number) }}
+          name: Primeiro Milhão ${{ github.ref_type == 'tag' && github.ref_name || format('v1.{0}', github.run_number) }}
+          files: primeiro-milhao.apk
+          make_latest: true

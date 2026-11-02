@@ -1,0 +1,8 @@
+{
+  "appId": "br.com.primeiromilhao.app",
+  "appName": "Primeiro Milhão",
+  "webDir": "www",
+  "backgroundColor": "#0b0b0b",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" }
+}

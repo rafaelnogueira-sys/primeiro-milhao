@@ -1,0 +1,202 @@
+{
+  "versao": 2,
+  "exemplo": false,
+  "perfil": {
+    "inicio": "2026-11",
+    "aporte": 2000,
+    "saldoInicial": 5000,
+    "taxaMensal": 1,
+    "crescimentoAporte": 0,
+    "inflacao": 4.5
+  },
+  "metas": [
+    {
+      "id": "m1",
+      "nome": "Reserva de 3 anos",
+      "valor": 50000,
+      "anos": 3
+    },
+    {
+      "id": "m2",
+      "nome": "Primeiro milhão",
+      "valor": 1000000,
+      "anos": 10
+    }
+  ],
+  "categorias": [
+    {
+      "id": "moradia",
+      "nome": "Moradia",
+      "cor": "#5B5BD6"
+    },
+    {
+      "id": "alimentacao",
+      "nome": "Alimentação",
+      "cor": "#F2994A"
+    },
+    {
+      "id": "transporte",
+      "nome": "Transporte",
+      "cor": "#2D9CDB"
+    },
+    {
+      "id": "lazer",
+      "nome": "Lazer",
+      "cor": "#D6409F"
+    },
+    {
+      "id": "academia",
+      "nome": "Academia",
+      "cor": "#13A8B8"
+    },
+    {
+      "id": "saude",
+      "nome": "Saúde",
+      "cor": "#C9A227"
+    },
+    {
+      "id": "educacao",
+      "nome": "Educação",
+      "cor": "#8D6E63"
+    },
+    {
+      "id": "assinaturas",
+      "nome": "Assinaturas",
+      "cor": "#A77BE0"
+    },
+    {
+      "id": "outros",
+      "nome": "Outros",
+      "cor": "#9A9A95"
+    }
+  ],
+  "recorrentes": [
+    {
+      "id": "r0",
+      "catId": "moradia",
+      "descricao": "Aluguel e condomínio",
+      "valor": 1900,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r1",
+      "catId": "moradia",
+      "descricao": "Luz, água e internet",
+      "valor": 320,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r2",
+      "catId": "alimentacao",
+      "descricao": "Mercado",
+      "valor": 900,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r3",
+      "catId": "alimentacao",
+      "descricao": "Restaurantes e delivery",
+      "valor": 400,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r4",
+      "catId": "transporte",
+      "descricao": "Combustível e aplicativo",
+      "valor": 450,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r5",
+      "catId": "lazer",
+      "descricao": "Saídas e passeios",
+      "valor": 450,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r6",
+      "catId": "academia",
+      "descricao": "Mensalidade da academia",
+      "valor": 140,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r7",
+      "catId": "saude",
+      "descricao": "Plano de saúde",
+      "valor": 380,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r8",
+      "catId": "educacao",
+      "descricao": "Curso de inglês",
+      "valor": 290,
+      "inicio": "",
+      "fim": ""
+    },
+    {
+      "id": "r9",
+      "catId": "assinaturas",
+      "descricao": "Streaming e apps",
+      "valor": 85,
+      "inicio": "",
+      "fim": ""
+    }
+  ],
+  "pontuais": [
+    {
+      "id": "p1",
+      "mes": "2027-01",
+      "catId": "moradia",
+      "descricao": "IPTU (cota única)",
+      "valor": 650
+    },
+    {
+      "id": "p2",
+      "mes": "2027-03",
+      "catId": "saude",
+      "descricao": "Dentista",
+      "valor": 400
+    },
+    {
+      "id": "p3",
+      "mes": "2027-07",
+      "catId": "lazer",
+      "descricao": "Viagem de férias",
+      "valor": 2800
+    },
+    {
+      "id": "p4",
+      "mes": "2027-12",
+      "catId": "lazer",
+      "descricao": "Presentes de fim de ano",
+      "valor": 900
+    }
+  ],
+  "rendas": [
+    {
+      "id": "rd1",
+      "descricao": "Salário líquido",
+      "valor": 8000,
+      "inicio": "",
+      "fim": ""
+    }
+  ],
+  "rendasPontuais": [
+    {
+      "id": "rp1",
+      "mes": "2027-12",
+      "descricao": "13º salário",
+      "valor": 4000
+    }
+  ]
+}
