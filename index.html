@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Primeiro Milhão · Baixar o app</title>
+<meta name="description" content="Baixe o app Primeiro Milhão para Android: metas, rendas e gastos, tudo salvo no seu celular.">
+<link rel="icon" href="app/icons/icon-192.png">
+<style>
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:100 900;font-display:swap;src:url(app/fonts/montserrat-latin.woff2) format('woff2')}
+:root{--paper:#f6f6f7;--ink:#0a0a0a;--sub:#6b6b70;--line:#ececee;--ok:#12884f;--card:#fff;--f:'Montserrat',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--f)}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+.hero{background:#0a0a0a;color:#fff;padding:48px 28px 40px;border-radius:28px;margin:16px 16px 0;box-shadow:0 10px 30px rgba(10,10,10,.18)}
+.hero .wrap{padding:0}
+@media (min-width:900px){.hero{max-width:848px;margin:24px auto 0}}
+.hero img{width:72px;height:72px;border-radius:16px;display:block;margin-bottom:20px}
+h1{font:800 clamp(38px,9vw,68px)/1 var(--f);letter-spacing:-.03em;margin:0 0 14px}
+h1 em{font-style:normal;color:rgba(255,255,255,.55)}
+.hero p{margin:0 0 28px;font-size:18px;color:rgba(255,255,255,.7);max-width:48ch}
+.botoes{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 22px;border-radius:14px;font:700 15px var(--f);text-decoration:none;border:2px solid #fff;color:#fff}
+.btn.principal{background:#fff;border-color:#fff;color:#0a0a0a}
+.btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+small.v{display:block;margin-top:14px;color:rgba(255,255,255,.5);font-size:13px}
+section{padding:40px 0;border-bottom:1px solid var(--line)}
+h2{font:800 24px var(--f);margin:0 0 16px;letter-spacing:-.02em}
+ol{padding-left:22px;display:grid;gap:10px;max-width:62ch;margin:0}
+.grade{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid #f0f0f2;border-radius:22px;padding:20px;box-shadow:0 1px 2px rgba(10,10,10,.04),0 8px 28px rgba(10,10,10,.05)}
+.card h3{margin:0 0 6px;font:700 16px var(--f)}
+.card p{margin:0;color:var(--sub);font-size:15px}
+.nota{color:var(--sub);font-size:14px;max-width:62ch}
+footer{padding:28px 0 48px;color:var(--sub);font-size:13px}
+a{color:inherit}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <img src="app/icons/icon-192.png" alt="" width="72" height="72">
+    <h1>Primeiro<br><em>Milhão</em></h1>
+    <p>Planeje quanto guardar, organize suas rendas e gastos e veja em quanto tempo chega lá. Seus dados ficam salvos no celular.</p>
+    <div class="botoes">
+      <a class="btn principal" id="apk" href="primeiro-milhao.apk" download>⬇ Baixar para Android (APK)</a>
+      <a class="btn" href="app/">Abrir no navegador</a>
+    </div>
+    <small class="v" id="versao">Arquivo .apk · Android 7 ou mais novo</small>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <h2>Instalar o APK no Android</h2>
+    <ol>
+      <li>Toque em <b>Baixar para Android</b> e aguarde o arquivo <span style="font-family:monospace">primeiro-milhao.apk</span> terminar de baixar.</li>
+      <li>Abra o arquivo pela notificação ou pelo app <b>Arquivos → Downloads</b>.</li>
+      <li>Se o Android perguntar, toque em <b>Configurações</b> e ative <b>Permitir desta fonte</b> para o navegador que você usou. É a permissão normal para instalar apps fora da Play Store.</li>
+      <li>Volte e toque em <b>Instalar</b>. Se aparecer o aviso do Play Protect, escolha <b>Instalar mesmo assim</b>.</li>
+    </ol>
+    <p class="nota" style="margin-top:14px">Para atualizar, baixe e instale o APK novo por cima. Se o Android disser <b>"App não instalado"</b>, desinstale a versão antiga e instale de novo. Com a sincronização ligada (aba <b>Ajustes</b>), seus dados voltam sozinhos da planilha ao conectar.</p>
+  </section>
+
+  <section>
+    <h2>Sem baixar arquivo: instalar pelo navegador</h2>
+    <p class="nota" style="margin-bottom:14px">Abra o app no Chrome do Android, toque no menu ⋮ e em <b>Instalar app</b> (ou <b>Adicionar à tela inicial</b>). Fica com ícone, em tela cheia, e funciona sem internet.</p>
+    <a class="btn" style="color:var(--ink);border-color:var(--ink)" href="app/">Abrir o app</a>
+  </section>
+
+  <section>
+    <h2>O que o app faz</h2>
+    <div class="grade">
+      <div class="card"><h3>Resumo do mês</h3><p>Balanço, entradas e saídas detalhadas e quanto falta para a sua meta principal.</p></div>
+      <div class="card"><h3>Metas e simulação</h3><p>Quanto guardar por mês para chegar ao primeiro milhão no prazo que você escolher.</p></div>
+      <div class="card"><h3>Rendas e gastos</h3><p>Salário, 13º, bônus, contas fixas e gastos do ano, mês a mês e por categoria.</p></div>
+      <div class="card"><h3>Investimentos</h3><p>Ações, ETFs, FIIs e criptomoedas com cotação atualizada, mais renda fixa. Veja quanto sua carteira variou hoje.</p></div>
+      <div class="card"><h3>Celular e site juntos</h3><p>Conecte sua planilha do Google e o que você muda no celular aparece no site, e o contrário também.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Primeiro Milhão é uma ferramenta de simulação, não recomendação de investimento.</div></footer>
+
+<script>
+// Quando o site está no GitHub Pages, o APK vem da última versão publicada em Releases do mesmo repositório.
+// Em outro servidor, basta colocar o arquivo primeiro-milhao.apk ao lado deste index.html.
+(function () {
+  var m = location.hostname.match(/^([^.]+)\.github\.io$/), seg = location.pathname.split('/').filter(Boolean)[0];
+  if (m && seg) {
+    var repo = 'https://github.com/' + m[1] + '/' + seg;
+    document.getElementById('apk').href = repo + '/releases/latest/download/primeiro-milhao.apk';
+    document.getElementById('versao').innerHTML = 'Arquivo .apk · Android 7 ou mais novo · <a href="' + repo + '/releases">todas as versões</a>';
+  }
+})();
+</script>
+</body>
+</html>

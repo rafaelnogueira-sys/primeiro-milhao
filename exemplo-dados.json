@@ -7,7 +7,9 @@
     "saldoInicial": 5000,
     "taxaMensal": 1,
     "crescimentoAporte": 0,
-    "inflacao": 4.5
+    "inflacao": 4.5,
+    "nome": "",
+    "usarCarteira": false
   },
   "metas": [
     {
@@ -197,6 +199,40 @@
       "mes": "2027-12",
       "descricao": "13º salário",
       "valor": 4000
+    }
+  ],
+  "investimentos": [
+    {
+      "id": "i1",
+      "tipo": "acao",
+      "ativo": "PETR4",
+      "quantidade": 100,
+      "precoMedio": 30,
+      "valorManual": 0
+    },
+    {
+      "id": "i2",
+      "tipo": "fii",
+      "ativo": "MXRF11",
+      "quantidade": 200,
+      "precoMedio": 9.5,
+      "valorManual": 0
+    },
+    {
+      "id": "i3",
+      "tipo": "cripto",
+      "ativo": "BTC",
+      "quantidade": 0.01,
+      "precoMedio": 300000,
+      "valorManual": 0
+    },
+    {
+      "id": "i4",
+      "tipo": "rf",
+      "ativo": "Tesouro Selic 2029",
+      "quantidade": 1,
+      "precoMedio": 1000,
+      "valorManual": 1100
     }
   ]
 }
